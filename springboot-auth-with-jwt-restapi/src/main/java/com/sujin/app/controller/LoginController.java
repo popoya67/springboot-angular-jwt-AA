@@ -30,6 +30,6 @@ public class LoginController {
 		}
 
 		return token != null ? ResponseEntity.ok().body(new ResponseMessage(null, token, true))
-				: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				: new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 	}
 }
