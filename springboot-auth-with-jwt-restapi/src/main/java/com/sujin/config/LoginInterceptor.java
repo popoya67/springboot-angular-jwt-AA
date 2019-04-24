@@ -9,6 +9,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.sujin.app.annotation.AdminOnly;
 import com.sujin.app.annotation.LoginRequired;
+import com.sujin.app.dto.TokenSet;
 import com.sujin.app.exception.AuthenticationException;
 import com.sujin.app.exception.AuthorizationException;
 import com.sujin.app.service.JwtService;
@@ -25,11 +26,19 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
-			final String token = request.getHeader("AUTH_TOKEN");
-			if (hm.hasMethodAnnotation(LoginRequired.class) && (token == null || !jwtService.isValidToken(token))) {
-				throw new AuthenticationException("접근 권한이 없습니다.");
+			String accessToken = request.getHeader("ACCESS_TOKEN");
+			final String refreshToken = request.getHeader("REFRESH_TOKEN");
+			
+			if( refreshToken !=null) {
+				TokenSet tokenSet = jwtService.refreshAccessToken(refreshToken);
+				accessToken = tokenSet.getAccessToken();
+				response.addHeader("ACCESS_TOKEN", accessToken);
+				response.addHeader("REFRESH_TOKEN", tokenSet.getRefreshToken());
 			}
-			if (hm.hasMethodAnnotation(AdminOnly.class) && !jwtService.getUser(token).getAuthority().contains(ADMIN)) {
+			if (hm.hasMethodAnnotation(LoginRequired.class) && (accessToken == null || !jwtService.isValidToken(accessToken, JwtService.AT_SECRET_KEY))) {
+				throw new AuthenticationException("로그인되어있지 않습니다.");
+			}
+			if (hm.hasMethodAnnotation(AdminOnly.class) && !jwtService.getUser(accessToken, JwtService.AT_SECRET_KEY).getAuthority().contains(ADMIN)) {
 				throw new AuthorizationException();
 			}
 		}

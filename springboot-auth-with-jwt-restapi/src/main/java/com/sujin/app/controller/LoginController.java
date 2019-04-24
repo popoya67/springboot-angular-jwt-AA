@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sujin.app.dto.TokenSet;
 import com.sujin.app.dto.User;
 import com.sujin.app.response.ResponseMessage;
 import com.sujin.app.service.JwtService;
@@ -23,13 +24,21 @@ public class LoginController {
 
 	@PostMapping("issueToken")
 	public ResponseEntity<ResponseMessage> issueToken(@RequestBody User user) {
-		String token = null;
+		TokenSet tokenSet = null;
 		User loginUser = userService.getUser(user);
 		if (loginUser != null) {
-			token = jwtService.createLoginToken(loginUser);
+			tokenSet = jwtService.createTokenSet(loginUser);
 		}
 
-		return token != null ? ResponseEntity.ok().body(new ResponseMessage(null, token, true))
+		return tokenSet != null ? ResponseEntity.ok().body(new ResponseMessage(null, tokenSet, true))
+				: new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+	}
+	
+	@PostMapping("refreshAccessToken")
+	public ResponseEntity<ResponseMessage> refreshAccessToken(@RequestBody String token) {
+		TokenSet tokenSet = jwtService.refreshAccessToken(token);
+
+		return tokenSet != null ? ResponseEntity.ok().body(new ResponseMessage(null, tokenSet, true))
 				: new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 	}
 }

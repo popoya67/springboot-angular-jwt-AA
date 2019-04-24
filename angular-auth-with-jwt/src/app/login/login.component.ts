@@ -27,8 +27,9 @@ export class LoginComponent implements OnInit {
 
     this._http.post("http://localhost:8080/issueToken", user).pipe(
       tap((res :any) => {
-        localStorage.setItem("AUTH_TOKEN", res.data);
-        this.userService.loginUser = this.jwtService.decodeToUser(res.data);
+        localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
+        localStorage.setItem("REFRESH_TOKEN", res.data.refreshToken);
+        this.userService.setLoginUser(this.jwtService.decodeToUser(res.data.accessToken));
       })
 
     ).subscribe(res =>{

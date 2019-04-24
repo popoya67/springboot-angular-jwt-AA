@@ -1,4 +1,4 @@
-<p>{{loginUser.name}}님 환영합니다.</p>
+<p>{{(loginUser|async).name}}님 환영합니다.</p>
 
 <div (click)="getPrivateInfo()">개인정보조회(TEST)</div>
 <div (click)="logout()">로그아웃</div>

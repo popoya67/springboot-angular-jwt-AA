@@ -4,13 +4,14 @@ import { HttpClient} from '@angular/common/http';
 import { tap} from 'rxjs/operators';
 import { UserService } from "../service/userService";
 import { User } from "../dto/user.model";
+import { Observable } from "rxjs";
 
 @Component({
     selector: 'app-login',
     templateUrl: './main.component.html'
   })
   export class MainComponent implements OnInit {
-    loginUser : User;
+    loginUser : Observable<User>;
     constructor(
         private router : Router,
         private _http: HttpClient,
@@ -21,7 +22,8 @@ import { User } from "../dto/user.model";
     }
 
     logout(){
-        localStorage.removeItem("AUTH_TOKEN");
+        localStorage.removeItem("ACCESS_TOKEN");
+        localStorage.removeItem("REFRESH_TOKEN");
         this.router.navigate(['login']);
     }
 

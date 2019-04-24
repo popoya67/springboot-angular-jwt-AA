@@ -42,6 +42,8 @@ public class SpringbootAuthWithJwtBoilerplateApplication {
 			operations.findAll(User.class).forEach(user -> {
 				System.out.println(user.toString());
 			});
+			
+			operations.createCollection("refreshToken");
 		};
 	}
 
